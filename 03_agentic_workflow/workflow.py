@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import sys
+from functools import lru_cache
 from pathlib import Path
 
 from langgraph.graph import END, START, StateGraph
@@ -13,15 +14,20 @@ from agentic_ai_lab.core import configure_logging, get_default_chat_model  # noq
 from state import WorkflowState
 
 
+@lru_cache(maxsize=1)
+def get_llm():
+    return get_default_chat_model()
+
+
 def create_outline(state: WorkflowState) -> WorkflowState:
-    response = get_default_chat_model().invoke(
+    response = get_llm().invoke(
         f"Create a simple 3-step outline that explains: {state['topic']}"
     )
     return {"outline": response.content}
 
 
 def write_draft(state: WorkflowState) -> WorkflowState:
-    response = get_default_chat_model().invoke(
+    response = get_llm().invoke(
         "Use this outline to write a beginner-friendly explanation.\n\n"
         f"Topic: {state['topic']}\n\nOutline:\n{state['outline']}"
     )
@@ -29,7 +35,7 @@ def write_draft(state: WorkflowState) -> WorkflowState:
 
 
 def review_draft(state: WorkflowState) -> WorkflowState:
-    response = get_default_chat_model().invoke(
+    response = get_llm().invoke(
         "Improve the clarity of this explanation and keep it concise.\n\n"
         f"Draft:\n{state['draft']}"
     )

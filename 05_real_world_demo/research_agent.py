@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import sys
+from functools import lru_cache
 from pathlib import Path
 from typing import TypedDict
 
@@ -21,22 +22,25 @@ class DemoState(TypedDict, total=False):
     brief: str
 
 
+@lru_cache(maxsize=1)
+def get_llm():
+    return get_default_chat_model()
+
+
 def planner(state: DemoState) -> DemoState:
-    response = get_default_chat_model().invoke(
-        f"{PLANNER_PROMPT}\n\nTopic: {state['topic']}"
-    )
+    response = get_llm().invoke(f"{PLANNER_PROMPT}\n\nTopic: {state['topic']}")
     return {"plan": response.content}
 
 
 def researcher(state: DemoState) -> DemoState:
-    response = get_default_chat_model().invoke(
+    response = get_llm().invoke(
         f"{RESEARCH_PROMPT}\n\nTopic: {state['topic']}\n\nPlan:\n{state['plan']}"
     )
     return {"research": response.content}
 
 
 def editor(state: DemoState) -> DemoState:
-    response = get_default_chat_model().invoke(
+    response = get_llm().invoke(
         f"{EDITOR_PROMPT}\n\nTopic: {state['topic']}\n\nPlan:\n{state['plan']}"
         f"\n\nResearch:\n{state['research']}"
     )

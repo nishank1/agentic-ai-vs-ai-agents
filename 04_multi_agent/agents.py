@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import sys
+from functools import lru_cache
 from pathlib import Path
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
@@ -11,8 +12,13 @@ from agentic_ai_lab.core import get_default_chat_model  # noqa: E402
 from state import MultiAgentState
 
 
+@lru_cache(maxsize=1)
+def get_llm():
+    return get_default_chat_model()
+
+
 def researcher(state: MultiAgentState) -> MultiAgentState:
-    response = get_default_chat_model().invoke(
+    response = get_llm().invoke(
         "You are a researcher. Create concise notes that explain the topic.\n\n"
         f"Topic: {state['topic']}"
     )
@@ -20,7 +26,7 @@ def researcher(state: MultiAgentState) -> MultiAgentState:
 
 
 def writer(state: MultiAgentState) -> MultiAgentState:
-    response = get_default_chat_model().invoke(
+    response = get_llm().invoke(
         "You are a writer. Use the research notes to write a clear explanation.\n\n"
         f"Topic: {state['topic']}\n\nResearch notes:\n{state['research_notes']}"
     )
@@ -28,7 +34,7 @@ def writer(state: MultiAgentState) -> MultiAgentState:
 
 
 def reviewer(state: MultiAgentState) -> MultiAgentState:
-    response = get_default_chat_model().invoke(
+    response = get_llm().invoke(
         "You are a reviewer. Improve the draft for accuracy and beginner clarity.\n\n"
         f"Draft:\n{state['draft']}"
     )
