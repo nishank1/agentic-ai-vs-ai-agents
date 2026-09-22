@@ -8,6 +8,12 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 
 
 def load_example_module(module_name: str, relative_path: str):
+    saved_modules = {
+        transient_module: sys.modules.get(transient_module)
+        for transient_module in ("state", "agents", "tools", "prompts")
+    }
+    original_sys_path = list(sys.path)
+
     for transient_module in ("state", "agents", "tools", "prompts"):
         sys.modules.pop(transient_module, None)
 
@@ -16,8 +22,16 @@ def load_example_module(module_name: str, relative_path: str):
     if parent not in sys.path:
         sys.path.insert(0, parent)
 
-    spec = importlib.util.spec_from_file_location(module_name, module_path)
-    module = importlib.util.module_from_spec(spec)
-    assert spec and spec.loader
-    spec.loader.exec_module(module)
-    return module
+    try:
+        spec = importlib.util.spec_from_file_location(module_name, module_path)
+        module = importlib.util.module_from_spec(spec)
+        assert spec and spec.loader
+        spec.loader.exec_module(module)
+        return module
+    finally:
+        sys.path[:] = original_sys_path
+        for transient_module, original_module in saved_modules.items():
+            if original_module is None:
+                sys.modules.pop(transient_module, None)
+            else:
+                sys.modules[transient_module] = original_module

@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from langchain_core.messages import AIMessage
+
 from agentic_ai_lab.core import (
     ExecutionLimits,
     RunContext,
@@ -18,6 +20,7 @@ def test_should_stop_when_iteration_limit_reached() -> None:
 
 def test_extract_text_content_supports_string_and_blocks() -> None:
     assert extract_text_content("hello") == "hello"
+    assert extract_text_content(AIMessage(content="message object")) == "message object"
     assert (
         extract_text_content(
             {
