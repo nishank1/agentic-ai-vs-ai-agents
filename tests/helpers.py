@@ -28,7 +28,8 @@ def load_example_module(module_name: str, relative_path: str):
 
         try:
             spec = importlib.util.spec_from_file_location(module_name, module_path)
-            assert spec and spec.loader
+            if spec is None or spec.loader is None:
+                raise ImportError(f"Could not load module from {module_path}")
             module = importlib.util.module_from_spec(spec)
             sys.modules[module_name] = module
             spec.loader.exec_module(module)
