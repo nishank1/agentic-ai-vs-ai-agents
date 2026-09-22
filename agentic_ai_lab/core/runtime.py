@@ -21,13 +21,14 @@ class RunContext(BaseModel):
 
 
 def should_stop(*, iterations: int, tool_calls: int, limits: ExecutionLimits) -> bool:
-    return (
-        iterations >= limits.max_iterations or tool_calls >= limits.max_tool_calls
-    )
+    return iterations >= limits.max_iterations or tool_calls >= limits.max_tool_calls
 
 
 def extract_text_content(message: Any) -> str:
     content = getattr(message, "content", message)
+
+    if isinstance(content, dict) and "content" in content:
+        content = content["content"]
 
     if isinstance(content, str):
         return content
@@ -41,4 +42,3 @@ def extract_text_content(message: Any) -> str:
         return "\n".join(chunk for chunk in text_chunks if chunk)
 
     return str(content)
-

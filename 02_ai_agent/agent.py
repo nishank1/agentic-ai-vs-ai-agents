@@ -33,9 +33,7 @@ def main() -> None:
         "agentic workflows make systems more reliable"
     )
 
-    result = agent.invoke(
-        {"messages": [{"role": "user", "content": user_message}]}
-    )
+    result = agent.invoke({"messages": [{"role": "user", "content": user_message}]})
     print(extract_text_content(result["messages"][-1]))
 
 

@@ -7,7 +7,9 @@ from langchain_openai import ChatOpenAI
 from .config import RuntimeConfig, load_runtime_config
 
 
-def build_chat_model(config: RuntimeConfig | None = None, **kwargs: object) -> ChatOpenAI:
+def build_chat_model(
+    config: RuntimeConfig | None = None, **kwargs: object
+) -> ChatOpenAI:
     runtime_config = config or load_runtime_config()
 
     return ChatOpenAI(
@@ -21,4 +23,3 @@ def build_chat_model(config: RuntimeConfig | None = None, **kwargs: object) -> C
 @lru_cache(maxsize=1)
 def get_default_chat_model() -> ChatOpenAI:
     return build_chat_model()
-

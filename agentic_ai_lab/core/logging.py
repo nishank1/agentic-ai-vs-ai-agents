@@ -24,4 +24,3 @@ def get_logger(name: str) -> logging.Logger:
 def log_event(logger: logging.Logger, event: str, **fields: Any) -> None:
     payload = {"event": event, **fields}
     logger.info(json.dumps(payload, sort_keys=True))
-

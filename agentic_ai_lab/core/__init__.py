@@ -18,4 +18,3 @@ __all__ = [
     "extract_text_content",
     "should_stop",
 ]
-

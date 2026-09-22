@@ -21,4 +21,3 @@ def load_example_module(module_name: str, relative_path: str):
     assert spec and spec.loader
     spec.loader.exec_module(module)
     return module
-

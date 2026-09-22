@@ -2,9 +2,9 @@ from __future__ import annotations
 
 import sys
 from pathlib import Path
+from typing import TypedDict
 
 from langgraph.graph import END, START, StateGraph
-from typing import TypedDict
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 if str(PROJECT_ROOT) not in sys.path:
@@ -28,7 +28,6 @@ def planner(state: DemoState) -> DemoState:
     return {"plan": response.content}
 
 
-
 def researcher(state: DemoState) -> DemoState:
     response = get_default_chat_model().invoke(
         f"{RESEARCH_PROMPT}\n\nTopic: {state['topic']}\n\nPlan:\n{state['plan']}"
@@ -36,13 +35,12 @@ def researcher(state: DemoState) -> DemoState:
     return {"research": response.content}
 
 
-
 def editor(state: DemoState) -> DemoState:
     response = get_default_chat_model().invoke(
-        f"{EDITOR_PROMPT}\n\nTopic: {state['topic']}\n\nPlan:\n{state['plan']}\n\nResearch:\n{state['research']}"
+        f"{EDITOR_PROMPT}\n\nTopic: {state['topic']}\n\nPlan:\n{state['plan']}"
+        f"\n\nResearch:\n{state['research']}"
     )
     return {"brief": response.content}
-
 
 
 def build_workflow():
@@ -55,7 +53,6 @@ def build_workflow():
     graph.add_edge("researcher", "editor")
     graph.add_edge("editor", END)
     return graph.compile()
-
 
 
 def main() -> None:

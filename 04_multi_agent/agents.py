@@ -19,14 +19,12 @@ def researcher(state: MultiAgentState) -> MultiAgentState:
     return {"research_notes": response.content}
 
 
-
 def writer(state: MultiAgentState) -> MultiAgentState:
     response = get_default_chat_model().invoke(
         "You are a writer. Use the research notes to write a clear explanation.\n\n"
         f"Topic: {state['topic']}\n\nResearch notes:\n{state['research_notes']}"
     )
     return {"draft": response.content}
-
 
 
 def reviewer(state: MultiAgentState) -> MultiAgentState:

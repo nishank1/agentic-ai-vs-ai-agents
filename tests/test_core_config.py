@@ -34,4 +34,3 @@ def test_build_chat_model_requires_api_key(monkeypatch: pytest.MonkeyPatch) -> N
 
     with pytest.raises(SystemExit):
         build_chat_model()
-

@@ -20,7 +20,6 @@ def create_outline(state: WorkflowState) -> WorkflowState:
     return {"outline": response.content}
 
 
-
 def write_draft(state: WorkflowState) -> WorkflowState:
     response = get_default_chat_model().invoke(
         "Use this outline to write a beginner-friendly explanation.\n\n"
@@ -29,14 +28,12 @@ def write_draft(state: WorkflowState) -> WorkflowState:
     return {"draft": response.content}
 
 
-
 def review_draft(state: WorkflowState) -> WorkflowState:
     response = get_default_chat_model().invoke(
         "Improve the clarity of this explanation and keep it concise.\n\n"
         f"Draft:\n{state['draft']}"
     )
     return {"final_answer": response.content}
-
 
 
 def build_workflow():
@@ -51,11 +48,12 @@ def build_workflow():
     return graph.compile()
 
 
-
 def main() -> None:
     configure_logging()
     app = build_workflow()
-    result = app.invoke({"topic": "the difference between AI agents and agentic workflows"})
+    result = app.invoke(
+        {"topic": "the difference between AI agents and agentic workflows"}
+    )
     print(result["final_answer"])
 
 

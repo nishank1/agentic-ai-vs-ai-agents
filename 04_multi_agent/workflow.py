@@ -26,7 +26,6 @@ def build_workflow():
     return graph.compile()
 
 
-
 def main() -> None:
     configure_logging()
     app = build_workflow()

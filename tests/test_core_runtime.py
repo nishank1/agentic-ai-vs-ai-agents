@@ -1,6 +1,11 @@
 from __future__ import annotations
 
-from agentic_ai_lab.core import ExecutionLimits, RunContext, extract_text_content, should_stop
+from agentic_ai_lab.core import (
+    ExecutionLimits,
+    RunContext,
+    extract_text_content,
+    should_stop,
+)
 
 
 def test_should_stop_when_iteration_limit_reached() -> None:
@@ -13,9 +18,17 @@ def test_should_stop_when_iteration_limit_reached() -> None:
 
 def test_extract_text_content_supports_string_and_blocks() -> None:
     assert extract_text_content("hello") == "hello"
-    assert extract_text_content(
-        {"content": [{"type": "text", "text": "first"}, {"type": "text", "text": "second"}]}
-    ) == "{'content': [{'type': 'text', 'text': 'first'}, {'type': 'text', 'text': 'second'}]}"
+    assert (
+        extract_text_content(
+            {
+                "content": [
+                    {"type": "text", "text": "first"},
+                    {"type": "text", "text": "second"},
+                ]
+            }
+        )
+        == "first\nsecond"
+    )
 
 
 def test_run_context_generates_run_id() -> None:

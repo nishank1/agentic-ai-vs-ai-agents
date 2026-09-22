@@ -38,4 +38,3 @@ def load_runtime_config(*, require_api_key: bool = True) -> RuntimeConfig:
         )
 
     return config
-
