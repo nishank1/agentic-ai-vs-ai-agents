@@ -1,35 +1,28 @@
 from __future__ import annotations
 
-import os
+import sys
+from pathlib import Path
 
-from dotenv import load_dotenv
-from langchain_openai import ChatOpenAI
-from langgraph.prebuilt import create_react_agent
+from langchain.agents import create_agent
 
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
+if str(PROJECT_ROOT) not in sys.path:
+    sys.path.insert(0, str(PROJECT_ROOT))
+
+from agentic_ai_lab.core import (  # noqa: E402
+    configure_logging,
+    extract_text_content,
+    get_default_chat_model,
+)
 from tools import count_words, get_current_utc_time
 
 
-def build_llm() -> ChatOpenAI:
-    load_dotenv()
-
-    api_key = os.getenv("OPENAI_API_KEY")
-    if not api_key or api_key == "your_api_key_here":
-        raise SystemExit(
-            "Please set OPENAI_API_KEY in your .env file before running this example."
-        )
-
-    return ChatOpenAI(
-        model=os.getenv("OPENAI_MODEL", "gpt-4o-mini"),
-        api_key=api_key,
-        base_url=os.getenv("OPENAI_BASE_URL") or None,
-    )
-
-
 def main() -> None:
-    agent = create_react_agent(
-        model=build_llm(),
+    configure_logging()
+    agent = create_agent(
+        model=get_default_chat_model(),
         tools=[get_current_utc_time, count_words],
-        prompt=(
+        system_prompt=(
             "You are a beginner-friendly AI agent. "
             "Use tools whenever they help you answer accurately."
         ),
@@ -40,8 +33,10 @@ def main() -> None:
         "agentic workflows make systems more reliable"
     )
 
-    result = agent.invoke({"messages": [("user", user_message)]})
-    print(result["messages"][-1].content)
+    result = agent.invoke(
+        {"messages": [{"role": "user", "content": user_message}]}
+    )
+    print(extract_text_content(result["messages"][-1]))
 
 
 if __name__ == "__main__":

@@ -1,30 +1,27 @@
 from __future__ import annotations
 
-import os
+import sys
+from pathlib import Path
 
-from dotenv import load_dotenv
-from langchain_openai import ChatOpenAI
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
+if str(PROJECT_ROOT) not in sys.path:
+    sys.path.insert(0, str(PROJECT_ROOT))
 
+from agentic_ai_lab.core import (  # noqa: E402
+    configure_logging,
+    get_default_chat_model,
+    get_logger,
+    log_event,
+)
 
-def build_llm() -> ChatOpenAI:
-    load_dotenv()
-
-    api_key = os.getenv("OPENAI_API_KEY")
-    if not api_key or api_key == "your_api_key_here":
-        raise SystemExit(
-            "Please set OPENAI_API_KEY in your .env file before running this example."
-        )
-
-    return ChatOpenAI(
-        model=os.getenv("OPENAI_MODEL", "gpt-4o-mini"),
-        api_key=api_key,
-        base_url=os.getenv("OPENAI_BASE_URL") or None,
-    )
+LOGGER = get_logger(__name__)
 
 
 def main() -> None:
-    llm = build_llm()
+    configure_logging()
+    llm = get_default_chat_model()
     prompt = "Explain in 3 short bullet points what an LLM is."
+    log_event(LOGGER, "llm_example_started", example="01_llm")
     response = llm.invoke(prompt)
 
     print("Prompt:")

@@ -1,41 +1,20 @@
 from __future__ import annotations
 
-import os
+import sys
+from pathlib import Path
 
-from dotenv import load_dotenv
-from langchain_openai import ChatOpenAI
 from langgraph.graph import END, START, StateGraph
 
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
+if str(PROJECT_ROOT) not in sys.path:
+    sys.path.insert(0, str(PROJECT_ROOT))
+
+from agentic_ai_lab.core import configure_logging, get_default_chat_model  # noqa: E402
 from state import WorkflowState
 
 
-def build_llm() -> ChatOpenAI:
-    load_dotenv()
-
-    api_key = os.getenv("OPENAI_API_KEY")
-    if not api_key or api_key == "your_api_key_here":
-        raise SystemExit(
-            "Please set OPENAI_API_KEY in your .env file before running this example."
-        )
-
-    return ChatOpenAI(
-        model=os.getenv("OPENAI_MODEL", "gpt-4o-mini"),
-        api_key=api_key,
-        base_url=os.getenv("OPENAI_BASE_URL") or None,
-    )
-
-_llm: ChatOpenAI | None = None
-
-
-def get_llm() -> ChatOpenAI:
-    global _llm
-    if _llm is None:
-        _llm = build_llm()
-    return _llm
-
-
 def create_outline(state: WorkflowState) -> WorkflowState:
-    response = get_llm().invoke(
+    response = get_default_chat_model().invoke(
         f"Create a simple 3-step outline that explains: {state['topic']}"
     )
     return {"outline": response.content}
@@ -43,7 +22,7 @@ def create_outline(state: WorkflowState) -> WorkflowState:
 
 
 def write_draft(state: WorkflowState) -> WorkflowState:
-    response = get_llm().invoke(
+    response = get_default_chat_model().invoke(
         "Use this outline to write a beginner-friendly explanation.\n\n"
         f"Topic: {state['topic']}\n\nOutline:\n{state['outline']}"
     )
@@ -52,7 +31,7 @@ def write_draft(state: WorkflowState) -> WorkflowState:
 
 
 def review_draft(state: WorkflowState) -> WorkflowState:
-    response = get_llm().invoke(
+    response = get_default_chat_model().invoke(
         "Improve the clarity of this explanation and keep it concise.\n\n"
         f"Draft:\n{state['draft']}"
     )
@@ -74,6 +53,7 @@ def build_workflow():
 
 
 def main() -> None:
+    configure_logging()
     app = build_workflow()
     result = app.invoke({"topic": "the difference between AI agents and agentic workflows"})
     print(result["final_answer"])
