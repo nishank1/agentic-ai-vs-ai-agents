@@ -12,6 +12,7 @@ def load_example_module(module_name: str, relative_path: str):
         transient_module: sys.modules.get(transient_module)
         for transient_module in ("state", "agents", "tools", "prompts")
     }
+    original_named_module = sys.modules.get(module_name)
     original_sys_path = list(sys.path)
 
     for transient_module in ("state", "agents", "tools", "prompts"):
@@ -26,10 +27,15 @@ def load_example_module(module_name: str, relative_path: str):
         spec = importlib.util.spec_from_file_location(module_name, module_path)
         module = importlib.util.module_from_spec(spec)
         assert spec and spec.loader
+        sys.modules[module_name] = module
         spec.loader.exec_module(module)
         return module
     finally:
         sys.path[:] = original_sys_path
+        if original_named_module is None:
+            sys.modules.pop(module_name, None)
+        else:
+            sys.modules[module_name] = original_named_module
         for transient_module, original_module in saved_modules.items():
             if original_module is None:
                 sys.modules.pop(transient_module, None)

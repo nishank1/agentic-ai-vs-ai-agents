@@ -21,4 +21,4 @@ def get_logger(name: str) -> logging.Logger:
 
 
 def log_event(logger: logging.Logger, event: str, **fields: Any) -> None:
-    logger.info(event, extra={"event_fields": fields})
+    logger.info("%s %s", event, fields, extra={"event_fields": fields})
