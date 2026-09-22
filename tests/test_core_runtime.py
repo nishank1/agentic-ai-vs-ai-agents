@@ -32,6 +32,18 @@ def test_extract_text_content_supports_string_and_blocks() -> None:
         )
         == "first\nsecond"
     )
+    assert (
+        extract_text_content(
+            {
+                "content": [
+                    {"type": "image", "image_url": "https://example.com/image.png"},
+                    {"type": "text", "text": "kept"},
+                ]
+            }
+        )
+        == "kept"
+    )
+    assert extract_text_content({"raw": 123}) == "{'raw': 123}"
 
 
 def test_run_context_generates_run_id() -> None:
