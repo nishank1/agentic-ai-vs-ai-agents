@@ -1,36 +1,20 @@
 from __future__ import annotations
 
-import os
+import sys
+from functools import lru_cache
+from pathlib import Path
 
-from dotenv import load_dotenv
-from langchain_openai import ChatOpenAI
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
+if str(PROJECT_ROOT) not in sys.path:
+    sys.path.insert(0, str(PROJECT_ROOT))
 
+from agentic_ai_lab.core import get_default_chat_model  # noqa: E402
 from state import MultiAgentState
 
 
-def build_llm() -> ChatOpenAI:
-    load_dotenv()
-
-    api_key = os.getenv("OPENAI_API_KEY")
-    if not api_key or api_key == "your_api_key_here":
-        raise SystemExit(
-            "Please set OPENAI_API_KEY in your .env file before running this example."
-        )
-
-    return ChatOpenAI(
-        model=os.getenv("OPENAI_MODEL", "gpt-4o-mini"),
-        api_key=api_key,
-        base_url=os.getenv("OPENAI_BASE_URL") or None,
-    )
-
-_llm: ChatOpenAI | None = None
-
-
-def get_llm() -> ChatOpenAI:
-    global _llm
-    if _llm is None:
-        _llm = build_llm()
-    return _llm
+@lru_cache(maxsize=1)
+def get_llm():
+    return get_default_chat_model()
 
 
 def researcher(state: MultiAgentState) -> MultiAgentState:
@@ -41,14 +25,12 @@ def researcher(state: MultiAgentState) -> MultiAgentState:
     return {"research_notes": response.content}
 
 
-
 def writer(state: MultiAgentState) -> MultiAgentState:
     response = get_llm().invoke(
         "You are a writer. Use the research notes to write a clear explanation.\n\n"
         f"Topic: {state['topic']}\n\nResearch notes:\n{state['research_notes']}"
     )
     return {"draft": response.content}
-
 
 
 def reviewer(state: MultiAgentState) -> MultiAgentState:

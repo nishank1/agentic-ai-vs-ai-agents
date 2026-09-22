@@ -1,0 +1,47 @@
+[build-system]
+requires = ["setuptools>=69", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "agentic-ai-vs-ai-agents"
+version = "0.1.0"
+description = "An Agentic AI Engineering Lab focused on reliability, control, and operability."
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "langchain>=1.0.0,<2.0.0",
+    "langchain-openai>=1.0.0,<2.0.0",
+    "langgraph>=1.0.0,<2.0.0",
+    "pydantic>=2.9.0,<3.0.0",
+    "python-dotenv>=1.0.1,<2.0.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.3.0,<9.0.0",
+    "ruff>=0.13.0,<0.14.0",
+]
+
+[tool.setuptools.packages.find]
+include = ["agentic_ai_lab*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+markers = [
+    "integration: tests that require external systems or networked services",
+    "llm: tests that require a live LLM provider",
+]
+
+[tool.ruff]
+line-length = 88
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B"]
+
+[tool.ruff.lint.per-file-ignores]
+"01_llm/*.py" = ["E402", "I001"]
+"02_ai_agent/*.py" = ["E402", "I001"]
+"03_agentic_workflow/*.py" = ["E402", "I001"]
+"04_multi_agent/*.py" = ["E402", "I001"]
+"05_real_world_demo/*.py" = ["E402", "I001"]

@@ -1,8 +1,8 @@
 # 02 - AI Agent
 
-This example upgrades a plain LLM into an agent.
+This example upgrades a plain LLM into a tool-using agent.
 
-## Idea
+## Architecture
 
 An AI agent is usually an LLM plus:
 
@@ -26,10 +26,29 @@ Agent (LLM + tools)
 ## Files
 
 - `tools.py` contains simple tools
-- `agent.py` creates a ReAct-style agent with LangGraph
+- `agent.py` creates a modern LangChain agent using tools and a system prompt
+
+## Entry point
+
+- `agent.py`
+
+## Configuration
+
+- Requires `OPENAI_API_KEY`
+- Supports `OPENAI_MODEL` and `OPENAI_BASE_URL`
 
 ## Run
 
 ```bash
 python 02_ai_agent/agent.py
 ```
+
+## Example input/output
+
+- Input: ask for the current UTC time and a word count
+- Output: the agent decides when to call tools and returns a final answer
+
+## Failure considerations
+
+- Tool-enabled autonomy increases flexibility and failure surface area.
+- The example does not yet enforce tool allowlists, loop limits, or argument validation; later sections will add those controls.
